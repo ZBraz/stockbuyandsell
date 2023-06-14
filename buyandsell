@@ -101,9 +101,8 @@ def main():
     initial_investment_limit = 2000.0
     investment_limit = initial_investment_limit
     stock_portfolio = {}
-
-    # Load progress from a file
-
+    goal_amount = float(input("Enter your goal amount: "))
+    
     while True:
         option = input("Enter 'buy' or 'sell' (or 'exit' to quit): ")
         if option.lower() == 'buy':
@@ -114,9 +113,12 @@ def main():
             break
         else:
             print("Invalid option. Try again.")
-
+            
     total_balance = calculate_total_balance(initial_investment_limit, stock_portfolio)
+    difference = total_balance - goal_amount
+    
     print(f"Total Balance: {total_balance}")
+    print(f"Difference from Goal: {difference}")
 
 
 if __name__ == '__main__':
