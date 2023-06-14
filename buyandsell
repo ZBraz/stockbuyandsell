@@ -113,7 +113,8 @@ def main():
             break
         else:
             print("Invalid option. Try again.")
-            
+     
+     #calculates total balance left and the difference from the goal user has set
     total_balance = calculate_total_balance(initial_investment_limit, stock_portfolio)
     difference = total_balance - goal_amount
     
