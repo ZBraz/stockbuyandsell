@@ -1,7 +1,9 @@
+# Purpose
+Stock marker simulator python program that allows users to manage their stock portfolio, buy and sell stocks, and track their total balance while also setting goals. 
+Run on google collaboratory  
 
-#Purpose
-Run on google colaborators 
+# Instalation
 
-INSTALATION
  pip install alpha_vantage 
+ 
  
