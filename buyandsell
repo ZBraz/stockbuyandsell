@@ -1,0 +1,124 @@
+from alpha_vantage.timeseries import TimeSeries
+import json
+API_KEY = '7D7X7Q02F8BL8WDT'
+
+
+def get_price(symbol):
+    try:
+        ts = TimeSeries(key=API_KEY, output_format='pandas')
+        data, meta_data = ts.get_intraday(symbol=symbol, interval='1min')
+        if '4. close' in data:
+            latest_close_price = data['4. close'].iloc[-1]
+            return latest_close_price
+        else:
+            print("No intraday data available for the symbol.")
+            return None
+    except Exception as e:
+        print(f"Error occurred while fetching price data: {e}")
+        return None
+
+
+def buy(investment_limit, stock_portfolio):
+    symbol = input("Enter the symbol: ")
+    amount = float(input("Enter the amount to buy: "))
+    price = get_price(symbol)
+    if price is not None:
+        # Calculate investment value
+        investment_value = amount * price
+
+        # Check if investment value exceeds the investment limit
+        if investment_value > investment_limit:
+            print("Investment value exceeds the limit. Cannot proceed.")
+        else:
+            # Update investment limit
+            investment_limit -= investment_value
+
+            # Update stock portfolio
+            if symbol in stock_portfolio:
+                stock_portfolio[symbol]['quantity'] += amount
+                stock_portfolio[symbol]['cost'] += investment_value
+            else:
+                stock_portfolio[symbol] = {'quantity': amount, 'cost': investment_value}
+
+            # ... perform necessary calculations and execute the buy order
+            print(f"Buying {amount} of {symbol} at price {price}")
+
+            # Save progress to a file
+
+    return investment_limit
+
+
+def sell(investment_limit, stock_portfolio):
+    symbol = input("Enter the symbol: ")
+    amount = float(input("Enter the amount to sell: "))
+    price = get_price(symbol)
+    if price is not None:
+        if symbol in stock_portfolio:
+            if amount > stock_portfolio[symbol]['quantity']:
+                print("Cannot sell more than the available quantity.")
+            else:
+                # Calculate sell value
+                sell_value = amount * price
+
+                # Update investment limit
+                investment_limit += sell_value
+
+                # Update stock portfolio
+                stock_portfolio[symbol]['quantity'] -= amount
+
+                # ... perform necessary calculations and execute the sell order
+                print(f"Selling {amount} of {symbol} at price {price}")
+
+                # Save progress to a file
+        else:
+            print("Symbol not found in stock portfolio.")
+    else:
+        print("Invalid symbol.")
+
+    return investment_limit
+
+
+def calculate_total_balance(investment_limit, stock_portfolio):
+    # Calculate total stock portfolio value
+    stock_portfolio_value = 0.0
+
+    # Calculate the value of each stock in the portfolio
+    for symbol, data in stock_portfolio.items():
+        price = get_price(symbol)
+        if price is not None:
+            stock_value = data['quantity'] * price
+            stock_portfolio_value += stock_value
+        else:
+            print(f"Error occurred while fetching price data for symbol {symbol}.")
+
+    # Calculate the total balance by subtracting the stock portfolio value from the investment limit
+    total_balance = investment_limit - stock_portfolio_value
+
+    return total_balance
+
+
+def main():
+    initial_investment_limit = 2000.0
+    investment_limit = initial_investment_limit
+    stock_portfolio = {}
+
+    # Load progress from a file
+
+    while True:
+        option = input("Enter 'buy' or 'sell' (or 'exit' to quit): ")
+        if option.lower() == 'buy':
+            investment_limit = buy(investment_limit, stock_portfolio)
+        elif option.lower() == 'sell':
+            investment_limit = sell(investment_limit, stock_portfolio)
+        elif option.lower() == 'exit':
+            break
+        else:
+            print("Invalid option. Try again.")
+
+    total_balance = calculate_total_balance(initial_investment_limit, stock_portfolio)
+    print(f"Total Balance: {total_balance}")
+
+
+if __name__ == '__main__':
+    main()
+
